@@ -17,8 +17,12 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
+# This contains the list of all commands: `/command`
+# stores objects as FaqBot.Command
 commands = {}
 
+# Iterate over all command directories, and create a FaqBot.Command for each
+# This in turn will iterate over all files to gather their respective FaqBot.Entrys
 def loadFiles(basedir) -> None:
     base = Path(basedir)
     for cmd in base.iterdir():
@@ -27,7 +31,9 @@ def loadFiles(basedir) -> None:
         commands[cmd.name] = Command(cmd)
     return
 
+# This is our main entry point
 def main(argv) -> None:
+    # First order of business is argument parsing. We use getopt for that
     basedir = ''
     tokenfile = ''
 
@@ -36,13 +42,14 @@ def main(argv) -> None:
     except getopt.GetoptError:
         print(sys.argv[0] + " -d path/to/faq-basedir -t tokenfile")
         sys.exit(1)
-    
+
     for opt, arg in opts:
         if opt in ("-b", "--basedir"):
             basedir = arg
         elif opt in ("-t", "--token"):
             tokenfile = arg
 
+    # Make sure we got all relevant parameters
     if basedir == '':
         print("Please pass a basedir using -b")
         sys.exit(1)
@@ -51,19 +58,26 @@ def main(argv) -> None:
         print("Please pass a tokenfile using -t")
         sys.exit(1)
 
+    # Load the Commands + their Entries
     loadFiles(basedir)
 
+    # Open the token file (the intention is to hide the token from the command line)
     tokenF = open(tokenfile, "r")
     token = tokenF.read().replace("\n", "")
 
+    # Prepare the actual bot
     updater = Updater(token=token)
     dispatcher = updater.dispatcher
 
+    # register the handler for each `/cmd`
     for cmd in commands:
         dispatcher.add_handler(CommandHandler(cmd, commands[cmd].handler))
 
+    # And start the actual bot.
+    # We just quit on ctrl+d (or if the unit file tells us to)
     updater.start_polling()
     updater.idle()
-    
+
+# Start the actual program
 if __name__ == '__main__':
     main(sys.argv[1:])
