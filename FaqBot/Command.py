@@ -28,7 +28,7 @@ class Command:
             if e.default:
                 if (self.default == None):
                     self.default = e
-                else
+                else:
                     print("Warning: Multiple defaults for command dir " + cmddir)
 
 
