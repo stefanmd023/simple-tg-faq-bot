@@ -8,6 +8,7 @@ class Entry:
     keywords = []
     text = ""
     file = ""
+    default = False
 
     # set the keywords from a given string, e.g. "foo, bar, baz"
     def setKeywords(self, kwStr):
@@ -78,6 +79,9 @@ class Entry:
                 # special case: parse every line after "text:"
                 # TODO someone might do a "text: first or only line", handle this
                 addText = 1
+            elif m[1] == "default":
+                if m[2].lower() in ("1", "true", "yes"):
+                    self.default = true
             else:
                 # this can't really happen for now, since the regex only produces the above cases
                 # should probably go into the "if not m:" body

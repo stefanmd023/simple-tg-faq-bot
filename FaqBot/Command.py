@@ -6,12 +6,14 @@ class Command:
     cmddir = ""
     keywords = {}
     entries = []
+    default = None
 
     # Constructor
     def __init__(self, cmddir):
         self.cmddir = cmddir
         self.keywords = {}
         self.entries = []
+        self.default = None
 
         # Gather all files from this commands directory, and create FaqBot.Entry objects from them
         for file in cmddir.iterdir():
@@ -22,6 +24,13 @@ class Command:
                     self.keywords[kw].append(e)
                 else:
                     self.keywords[kw] = [e]
+            # Allow defining a default reply that's returned on '/cmd':
+            if e.default:
+                if (self.default == None):
+                    self.default = e
+                else
+                    print("Warning: Multiple defaults for command dir " + cmddir)
+
 
     # Debug: print some info on this command to the command line
     def printInfo(self):
@@ -44,7 +53,9 @@ class Command:
 
         # Only got the command, so give the user a list of known keywords OR print the singular entry for this command
         if len(kwListRaw) == 1:
-            if len(self.keywords) == 1:
+            if self.default != None:
+                found.append(self.default)
+            elif len(self.keywords) == 1:
                 # this command has a singular entry. just return that
                 found.append(self.entries[0])
             else:
