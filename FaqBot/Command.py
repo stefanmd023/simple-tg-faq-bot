@@ -39,10 +39,17 @@ class Command:
         # The 0th argument will be the command itself
         kwListRaw = update.message.text.split(" ")
 
-        # Only got the command, so give the user a list of known keywords:
+        # This will store the entries we found
+        found = []
+
+        # Only got the command, so give the user a list of known keywords OR print the singular entry for this command
         if len(kwListRaw) == 1:
-            update.message.reply_text("Please give a list of space-separated keywords to find entries matching ALL keywords (logical-and).\nKnown keywords: " + ", ".join(self.keywords))
-            return
+            if len(self.keywords) == 1:
+                # this command has a singular entry. just return that
+                found.append(self.entries[0])
+            else:
+                update.message.reply_text("Please give a list of space-separated keywords to find entries matching ALL keywords (logical-and).\nKnown keywords: " + ", ".join(self.keywords))
+                return
 
         # We got at least one keyword to look for
         # The user might have used ',' for separation, we filter those in this loop
@@ -61,7 +68,6 @@ class Command:
                 kwList.append(kw)
 
         # Now for each entry, filter those that match ALL keywords
-        found = []
         for e in self.entries:
             match = 1
             for kw in kwList:
@@ -84,5 +90,5 @@ class Command:
         for e in found:
             reply += "<i><b>" + e.title + "</b></i>\n"
             reply += e.text
-        
+
         update.message.reply_text(text=reply, parse_mode=ParseMode.HTML)
