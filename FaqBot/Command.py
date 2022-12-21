@@ -29,7 +29,8 @@ class Command:
                 if (self.default == None):
                     self.default = e
                 else:
-                    print("Warning: Multiple defaults for command dir " + cmddir)
+                    # TODO better warning (which command, which entries?)
+                    print("Warning: Multiple defaults!")
 
 
     # Debug: print some info on this command to the command line

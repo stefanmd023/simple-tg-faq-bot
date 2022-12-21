@@ -61,7 +61,7 @@ class Entry:
                 continue
 
             # split a line "   foo: bar # baz" into a "foo" and "bar # baz"
-            m = re.match("^\s*(title|short-title|keywords|text):\s*(.*)", line)
+            m = re.match("^\s*(title|short-title|keywords|text|default):\s*(.*)", line)
 
             # silently ignore any line that does not match
             # TODO better error handling, people might be surprised by this
@@ -81,7 +81,7 @@ class Entry:
                 addText = 1
             elif m[1] == "default":
                 if m[2].lower() in ("1", "true", "yes"):
-                    self.default = true
+                    self.default = True
             else:
                 # this can't really happen for now, since the regex only produces the above cases
                 # should probably go into the "if not m:" body
