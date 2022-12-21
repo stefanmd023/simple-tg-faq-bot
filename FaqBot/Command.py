@@ -41,26 +41,16 @@ class Command:
                 l.append(e.short_title)
             print(" * " + kw + ": " + ", ".join(l))
 
-    # This creates the reply to this command
-    def handler(self, update, context):
-
-        # We expect a list of space separated arguments to the command
-        # The 0th argument will be the command itself
-        kwListRaw = update.message.text.split(" ")
-
-        # This will store the entries we found
-        found = []
-
+    def findEntries(self, kwListRaw):
         # Only got the command, so give the user a list of known keywords OR print the singular entry for this command
         if len(kwListRaw) == 1:
             if self.default != None:
-                found.append(self.default)
+                return [self.default]
             elif len(self.keywords) == 1:
                 # this command has a singular entry. just return that
-                found.append(self.entries[0])
+                return self.entries
             else:
-                update.message.reply_text("Please give a list of space-separated keywords to find entries matching ALL keywords (logical-and).\nKnown keywords: " + ", ".join(self.keywords))
-                return
+                return None
 
         # We got at least one keyword to look for
         # The user might have used ',' for separation, we filter those in this loop
@@ -79,6 +69,7 @@ class Command:
                 kwList.append(kw)
 
         # Now for each entry, filter those that match ALL keywords
+        found = []
         for e in self.entries:
             match = 1
             for kw in kwList:
@@ -90,6 +81,19 @@ class Command:
             # all user supplied keywords were in the entries list:
             if match == 1:
                 found.append(e)
+
+        return found
+
+    # This creates the reply to this command
+    def handler(self, update, context):
+        # We expect a list of space separated arguments to the command
+        # The 0th argument will be the command itself
+        found = self.findEntries(update.message.text.split(" "))
+
+        # found did produce an error:
+        if found == None:
+            update.message.reply_text("Please give a list of space-separated keywords to find entries matching ALL keywords (logical-and).\nKnown keywords: " + ", ".join(self.keywords))
+            return
 
         # give a message if nothing was found
         if len(found) == 0:
