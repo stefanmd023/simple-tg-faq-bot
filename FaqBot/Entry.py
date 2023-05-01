@@ -1,4 +1,5 @@
 import re;
+import os;
 
 # This contains a single entry
 class Entry:
@@ -8,6 +9,7 @@ class Entry:
     keywords = []
     text = ""
     file = ""
+    img = False
     default = False
 
     # set the keywords from a given string, e.g. "foo, bar, baz"
@@ -26,6 +28,11 @@ class Entry:
     # set the full title
     def setTitle(self, string):
         self.title = string
+
+    # add an image
+    def setImg(self, string):
+        self.img = os.path.dirname(self.file) + "/" + string
+        print("Img: " + self.img + "\n")
 
     # validate the entry
     def valid(self):
@@ -53,19 +60,26 @@ class Entry:
         lineno = 0
         self.keywords = []
         for line in f:
-            ++lineno
+            lineno = lineno + 1
 
             # after we're done done with everything else, this parses the content after the "text:" line
             if addText == 1:
                 self.text += line
                 continue
 
+            if line == "" or line == "\n":
+                continue
+
+            if (re.match("^\s*#", line)):
+                continue
+
             # split a line "   foo: bar # baz" into a "foo" and "bar # baz"
-            m = re.match("^\s*(title|short-title|keywords|text|default):\s*(.*)", line)
+            m = re.match("^\s*(title|img|short-title|keywords|text|default):\s*(.*)", line)
 
             # silently ignore any line that does not match
             # TODO better error handling, people might be surprised by this
             if not m:
+                print("Ignoring unknown key in {}:{}".format(str(file), lineno))
                 continue
 
             # handle the known fields from the file:
@@ -82,9 +96,12 @@ class Entry:
             elif m[1] == "default":
                 if m[2].lower() in ("1", "true", "yes"):
                     self.default = True
+            elif m[1] == "img":
+                print("img!\n")
+                self.setImg(m[2])
             else:
                 # this can't really happen for now, since the regex only produces the above cases
                 # should probably go into the "if not m:" body
-                print("Bad key at " + file + ":" + lineno)
+                print("Bad key at " + str(file) + ":" + lineno)
 
         return

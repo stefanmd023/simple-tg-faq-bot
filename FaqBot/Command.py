@@ -1,5 +1,6 @@
 from FaqBot.Entry import Entry
-from telegram import ParseMode
+from telegram.constants import ParseMode
+import re
 
 # This class stores everything needed for a single `/command`
 class Command:
@@ -17,6 +18,10 @@ class Command:
 
         # Gather all files from this commands directory, and create FaqBot.Entry objects from them
         for file in cmddir.iterdir():
+            if not file.match('*.txt'):
+                print("Not loading " + str(file) + "\n");
+                continue
+
             e = Entry(file)
             self.entries.append(e)
             for kw in e.keywords:
@@ -86,19 +91,19 @@ class Command:
         return found
 
     # This creates the reply to this command
-    def handler(self, update, context):
+    async def handler(self, update, context):
         # We expect a list of space separated arguments to the command
         # The 0th argument will be the command itself
         found = self.findEntries(update.message.text.split(" "))
 
         # found did produce an error:
         if found == None:
-            update.message.reply_text("Please give a list of space-separated keywords to find entries matching ALL keywords (logical-and).\nKnown keywords: " + ", ".join(self.keywords))
+            await update.message.reply_text("Please give a list of space-separated keywords to find entries matching ALL keywords (logical-and).\nKnown keywords: " + ", ".join(self.keywords))
             return
 
         # give a message if nothing was found
         if len(found) == 0:
-            update.message.reply_text("Nothing found. To get a list of keywords use /" + self.cmddir.name)
+            await update.message.reply_text("Nothing found. To get a list of keywords use /" + self.cmddir.name)
             return
 
         # format the result(s) and return them to the user
@@ -107,4 +112,7 @@ class Command:
             reply += "<i><b>" + e.title + "</b></i>\n"
             reply += e.text
 
-        update.message.reply_text(text=reply, parse_mode=ParseMode.HTML)
+        if e.img:
+            await update.message.reply_photo(photo=e.img, caption=reply, parse_mode=ParseMode.HTML)
+        else:
+            await update.message.reply_text(text=reply, parse_mode=ParseMode.HTML)

@@ -1,12 +1,9 @@
 #!/usr/bin/env python3
 import os, sys, getopt, logging
 
-from FaqBot.Command import Command;
+from FaqBot.Command import Command
 
-from telegram.ext import (
-    Updater,
-    CommandHandler
-)
+from telegram.ext import Application, CommandHandler, MessageHandler
 
 from pathlib import Path
 
@@ -30,6 +27,10 @@ def loadFiles(basedir) -> None:
             continue
         commands[cmd.name] = Command(cmd)
     return
+
+# Debug: Log every message
+async def logMessages(update, context):
+    print(update.message.text)
 
 # This is our main entry point
 def main(argv) -> None:
@@ -66,17 +67,16 @@ def main(argv) -> None:
     token = tokenF.read().replace("\n", "")
 
     # Prepare the actual bot
-    updater = Updater(token=token)
-    dispatcher = updater.dispatcher
+    app = Application.builder().token(token).build()
 
+    #app.add_handler(MessageHandler(None, logMessages, block=False))
     # register the handler for each `/cmd`
     for cmd in commands:
-        dispatcher.add_handler(CommandHandler(cmd, commands[cmd].handler))
+        app.add_handler(CommandHandler(cmd, commands[cmd].handler))
 
     # And start the actual bot.
     # We just quit on ctrl+d (or if the unit file tells us to)
-    updater.start_polling()
-    updater.idle()
+    app.run_polling()
 
 # Start the actual program
 if __name__ == '__main__':
