@@ -20,6 +20,9 @@ title: Can not write to '...' (Read-only file system)
 # A short title, not used right now, but make it unique ;-)
 short-title: read-only
 
+# Optionally, you can also add an image. The file path is relative to the text file:
+img: my-image.jpg
+
 # Everything after the "text" line will be the actual article.
 text:
 The file can not be written to the current directory (probably "/").
