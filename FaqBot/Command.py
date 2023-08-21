@@ -108,9 +108,15 @@ class Command:
 
         # format the result(s) and return them to the user
         reply = ""
+        if len(found) > 1:
+            reply = "Keyword has " + str(len(found)) + " matches:\n\n"
+        first = True
         for e in found:
+            if not first:
+                reply += "\n-------------------------\n\n"
             reply += "<i><b>" + e.title + "</b></i>\n"
             reply += e.text
+            first = False
 
         if e.img:
             await update.message.reply_photo(photo=e.img, caption=reply, parse_mode=ParseMode.HTML)

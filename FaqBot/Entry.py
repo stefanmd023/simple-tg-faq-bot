@@ -84,7 +84,8 @@ class Entry:
 
             # handle the known fields from the file:
             if m[1] == "keywords":
-                self.setKeywords(m[2])
+                if m[2] != "":
+                    self.setKeywords(m[2])
             elif m[1] == "short-title":
                 self.setShortTitle(m[2])
             elif m[1] == "title":
@@ -102,6 +103,9 @@ class Entry:
             else:
                 # this can't really happen for now, since the regex only produces the above cases
                 # should probably go into the "if not m:" body
-                print("Bad key at " + str(file) + ":" + lineno)
+                print("Bad key at " + str(file) + ":" + lineno + "\n")
+
+        if len(self.keywords) == 0:
+            print("No keywords for file " + str(file) + "\n");
 
         return
