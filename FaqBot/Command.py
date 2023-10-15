@@ -9,6 +9,8 @@ class Command:
     entries = []
     default = None
 
+    dm_hint = "\n\nHint: You can also chat directly with me via @ValetuBot"
+
     # Constructor
     def __init__(self, cmddir):
         self.cmddir = cmddir
@@ -19,7 +21,7 @@ class Command:
         # Gather all files from this commands directory, and create FaqBot.Entry objects from them
         for file in cmddir.iterdir():
             if not file.match('*.txt'):
-                print("Not loading " + str(file) + "\n");
+                print("Not loading " + str(file) + "\n")
                 continue
 
             e = Entry(file)
@@ -100,12 +102,12 @@ class Command:
 
         # found did produce an error:
         if found is None:
-            await update.message.reply_text("Please give a list of space-separated keywords to find entries matching ALL keywords (logical-and).\nKnown keywords: " + ", ".join(sorted(self.keywords)))
+            await update.message.reply_text("Please give a list of space-separated keywords to find entries matching ALL keywords (logical-and).\nKnown keywords: " + ", ".join(sorted(self.keywords)) + self.dm_hint)
             return
 
         # give a message if nothing was found
         if len(found) == 0:
-            await update.message.reply_text("Nothing found. To get a list of keywords use /" + self.cmddir.name)
+            await update.message.reply_text("Nothing found. To get a list of keywords use /" + self.cmddir.name + self.dm_hint)
             return
         
         if len(found) > 3:
@@ -135,6 +137,8 @@ class Command:
                 reply += ", "
             reply += k
             first = False
+
+        reply += self.dm_hint
 
         await update.message.reply_text(text=reply, parse_mode=ParseMode.HTML)
         return True
