@@ -80,11 +80,11 @@ class Entry:
             if line == "" or line == "\n":
                 continue
 
-            if (re.match("^\s*#", line)):
+            if (re.match(r'^\s*#', line)):
                 continue
 
             # split a line "   foo: bar # baz" into a "foo" and "bar # baz"
-            m = re.match("^\s*(title|img|short-title|keywords|text|default):\s*(.*)", line)
+            m = re.match(r'^\s*(title|img|short-title|keywords|text|default):\s*(.*)', line)
 
             # silently ignore any line that does not match
             # TODO better error handling, people might be surprised by this
