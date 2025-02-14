@@ -9,7 +9,7 @@ class Command:
     entries = []
     default = None
 
-    dm_hint = "\n\nHint: You can also chat directly with me via @ValetuBot"
+    dm_hint = "\n\nHint: You can also chat directly with me via @BanValeBot"
 
     # Constructor
     def __init__(self, cmddir):
